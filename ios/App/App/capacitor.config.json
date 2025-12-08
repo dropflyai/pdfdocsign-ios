@@ -1,12 +1,12 @@
 {
-	"appId": "com.dropfly.pdfeditor",
+	"appId": "com.dropfly.pdfdocsign",
 	"appName": "PDF Doc Sign",
 	"webDir": "out",
-	"ios": {
-		"contentInset": "always"
-	},
 	"server": {
-		"iosScheme": "capacitor"
+		"androidScheme": "https"
+	},
+	"ios": {
+		"contentInset": "automatic"
 	},
 	"packageClassList": []
 }
