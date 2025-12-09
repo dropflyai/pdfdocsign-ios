@@ -58,6 +58,8 @@ jobs:
             -scheme App \
             -configuration Release \
             -archivePath $PWD/build/App.xcarchive \
+            DEVELOPMENT_TEAM=G46B7YC46C \
+            CODE_SIGN_STYLE=Manual \
             archive
 
       - name: Export IPA
