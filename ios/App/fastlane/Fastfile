@@ -7,12 +7,12 @@ platform :ios do
   lane :beta do
     # Increment build number
     increment_build_number(
-      xcodeproj: "PDFDocSign.xcodeproj"
+      xcodeproj: "App.xcodeproj"
     )
 
     # Build the app
     build_app(
-      workspace: "PDFDocSign.xcworkspace",
+      workspace: "App.xcworkspace",
       scheme: "App",
       export_method: "app-store",
       export_options: {
@@ -38,7 +38,7 @@ platform :ios do
   desc "Build without uploading"
   lane :build_only do
     build_app(
-      workspace: "PDFDocSign.xcworkspace",
+      workspace: "App.xcworkspace",
       scheme: "App",
       export_method: "app-store"
     )
