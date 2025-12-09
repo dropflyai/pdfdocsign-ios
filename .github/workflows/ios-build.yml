@@ -48,7 +48,7 @@ jobs:
       - name: Download Provisioning Profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "${{ secrets.IOS_PROVISIONING_PROFILE }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+          echo "${{ secrets.IOS_PROVISIONING_PROFILE }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/7d6bc867-b0d6-4706-8b51-607dfc8abcf2.mobileprovision
 
       - name: Build iOS App
         run: |
@@ -60,6 +60,7 @@ jobs:
             -archivePath $PWD/build/App.xcarchive \
             DEVELOPMENT_TEAM=G46B7YC46C \
             CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE=7d6bc867-b0d6-4706-8b51-607dfc8abcf2 \
             archive
 
       - name: Export IPA
