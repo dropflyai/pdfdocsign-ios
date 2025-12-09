@@ -66,21 +66,22 @@ jobs:
       - name: Build iOS App
         run: |
           cd ios/App
-          xcodebuild \
+          xcodebuild clean archive \
             -workspace App.xcworkspace \
             -scheme App \
             -configuration Release \
-            -archivePath $PWD/build/App.xcarchive \
-            archive
+            -archivePath build/App.xcarchive \
+            -allowProvisioningUpdates \
+            -destination generic/platform=iOS
 
       - name: Export IPA
         run: |
           cd ios/App
           xcodebuild \
             -exportArchive \
-            -archivePath $PWD/build/App.xcarchive \
+            -archivePath build/App.xcarchive \
             -exportOptionsPlist exportOptions.plist \
-            -exportPath $PWD/build
+            -exportPath build
 
       - name: Upload IPA to GitHub Artifacts (backup)
         if: always()
