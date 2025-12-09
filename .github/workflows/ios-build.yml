@@ -1,12 +1,12 @@
-name: Build iOS App
+name: Build and Upload to TestFlight
 
 on:
   push:
     branches: [ main, master ]
-  workflow_dispatch:
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
 
 jobs:
-  build-ios:
+  build-and-deploy:
     runs-on: macos-latest
 
     steps:
@@ -48,7 +48,20 @@ jobs:
       - name: Download Provisioning Profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "${{ secrets.IOS_PROVISIONING_PROFILE }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/7d6bc867-b0d6-4706-8b51-607dfc8abcf2.mobileprovision
+          # Decode and save profile
+          echo "${{ secrets.IOS_PROVISIONING_PROFILE }}" | base64 --decode > profile.mobileprovision
+          security cms -D -i profile.mobileprovision > profile.plist
+          PP_UUID=$(/usr/libexec/PlistBuddy -c "Print :UUID" profile.plist)
+          echo "Provisioning Profile UUID: $PP_UUID"
+          # Extract Profile Name
+          PP_NAME=$(/usr/libexec/PlistBuddy -c "Print :Name" profile.plist)
+          echo "Provisioning Profile Name: $PP_NAME"
+          PP_APP_ID=$(/usr/libexec/PlistBuddy -c "Print :Entitlements:application-identifier" profile.plist)
+          echo "Provisioning Profile App ID: $PP_APP_ID"
+          cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$PP_UUID.mobileprovision
+          # List installed profiles
+          echo "Installed provisioning profiles:"
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
 
       - name: Build iOS App
         run: |
@@ -58,9 +71,6 @@ jobs:
             -scheme App \
             -configuration Release \
             -archivePath $PWD/build/App.xcarchive \
-            DEVELOPMENT_TEAM=G46B7YC46C \
-            CODE_SIGN_STYLE=Manual \
-            PROVISIONING_PROFILE=7d6bc867-b0d6-4706-8b51-607dfc8abcf2 \
             archive
 
       - name: Export IPA
@@ -72,11 +82,12 @@ jobs:
             -exportOptionsPlist exportOptions.plist \
             -exportPath $PWD/build
 
-      - name: Upload IPA to GitHub Artifacts
+      - name: Upload IPA to GitHub Artifacts (backup)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: PDF-Doc-Sign-iOS
-          path: ios/App/build/*.ipa
+          name: PDF-Doc-Sign-iOS-Build-${{ github.run_number }}
+          path: ./ios/App/build/*.ipa
           retention-days: 30
 
       - name: Upload to TestFlight

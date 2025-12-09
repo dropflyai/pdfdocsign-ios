@@ -4,17 +4,20 @@
 <dict>
     <key>method</key>
     <string>app-store</string>
-    <key>uploadSymbols</key>
-    <true/>
-    <key>uploadBitcode</key>
-    <false/>
-    <key>signingStyle</key>
-    <string>automatic</string>
     <key>teamID</key>
     <string>G46B7YC46C</string>
-    <key>signingCertificate</key>
-    <string>Apple Distribution</string>
-    <key>destination</key>
-    <string>upload</string>
+    <key>uploadBitcode</key>
+    <false/>
+    <key>compileBitcode</key>
+    <false/>
+    <key>uploadSymbols</key>
+    <true/>
+    <key>signingStyle</key>
+    <string>manual</string>
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>com.dropfly.pdfeditor</key>
+        <string>PDF Doc Sign App Store</string>
+    </dict>
 </dict>
 </plist>
