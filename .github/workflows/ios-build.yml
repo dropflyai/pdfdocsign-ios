@@ -39,52 +39,25 @@ jobs:
           cd ios/App
           pod install
 
-      - name: Import Code-Signing Certificates
-        uses: apple-actions/import-codesign-certs@v2
-        with:
-          p12-file-base64: ${{ secrets.IOS_CERTIFICATE_P12 }}
-          p12-password: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
-
-      - name: Download Provisioning Profile
+      - name: Install Fastlane
         run: |
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "${{ secrets.IOS_PROVISIONING_PROFILE }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+          gem install fastlane
 
-      - name: Build iOS App
-        run: |
-          cd ios/App
-          xcodebuild \
-            -workspace App.xcworkspace \
-            -scheme App \
-            -configuration Release \
-            -archivePath $PWD/build/App.xcarchive \
-            archive
-
-      - name: Export IPA
-        run: |
-          cd ios/App
-          xcodebuild \
-            -exportArchive \
-            -archivePath $PWD/build/App.xcarchive \
-            -exportOptionsPlist exportOptions.plist \
-            -exportPath $PWD/build
-
-      - name: Upload IPA to GitHub Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: PDF-Doc-Sign-iOS
-          path: ios/App/build/*.ipa
-          retention-days: 30
-
-      - name: Upload to TestFlight
+      - name: Build and Upload to TestFlight with Fastlane
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
-          APP_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+          FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
         run: |
-          cd ios/App/build
-          xcrun altool --upload-app \
-            -f *.ipa \
-            -t ios \
-            -u "$APPLE_ID" \
-            -p "$APP_SPECIFIC_PASSWORD" \
-            --verbose
+          cd ios/App
+          fastlane beta
+
+      - name: Upload IPA to GitHub Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: PDF-Doc-Sign-iOS-Build-${{ github.run_number }}
+          path: ios/App/*.ipa
+          retention-days: 30
