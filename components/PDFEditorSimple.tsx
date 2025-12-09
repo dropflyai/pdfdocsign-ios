@@ -1515,6 +1515,15 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                     onMouseDown={(e) => {
                       e.stopPropagation();
                     }}
+                    onTouchStart={(e) => {
+                      e.stopPropagation();
+                    }}
+                    onTouchEnd={(e) => {
+                      e.stopPropagation();
+                      // iOS: Ensure input receives focus after touch
+                      const target = e.target as HTMLInputElement;
+                      setTimeout(() => target.focus(), 0);
+                    }}
                     data-field-id={ann.id}
                     data-form-field="true"
                     onFocus={(e) => {
@@ -1548,6 +1557,9 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                       whiteSpace: 'nowrap',
                       lineHeight: `${ann.height * pageScale - 4}px`,
                       textAlign: ann.width < 40 ? 'center' : 'left',
+                      WebkitUserSelect: 'text',
+                      WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+                      touchAction: 'manipulation',
                     }}
                     placeholder=""
                     autoComplete="off"
@@ -1645,6 +1657,9 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                       whiteSpace: 'nowrap',
                       lineHeight: `${ann.height * pageScale - 4}px`,
                       textAlign: ann.width < 40 ? 'center' : 'left',
+                      WebkitUserSelect: 'text',
+                      WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+                      touchAction: 'manipulation',
                     }}
                     placeholder=""
                     autoComplete="off"
