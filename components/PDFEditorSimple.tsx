@@ -1424,7 +1424,14 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
         <div
           ref={pdfContainerRef}
           className="relative bg-white shadow-2xl mx-auto w-fit"
-          onClick={handlePdfClick}
+          onClick={(e) => {
+            // Don't handle clicks on form fields
+            const target = e.target as HTMLElement;
+            if (target.tagName === 'INPUT' || target.closest('[data-form-field="true"]')) {
+              return;
+            }
+            handlePdfClick(e);
+          }}
           style={{
             cursor: selectedTool === 'signature' || selectedTool === 'text' ? 'crosshair' : 'default',
             transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoom})`,
@@ -1517,12 +1524,12 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                     }}
                     onTouchStart={(e) => {
                       e.stopPropagation();
+                      // iOS: Focus must happen during touch event, not in setTimeout
+                      const target = e.target as HTMLInputElement;
+                      target.focus();
                     }}
                     onTouchEnd={(e) => {
                       e.stopPropagation();
-                      // iOS: Ensure input receives focus after touch
-                      const target = e.target as HTMLInputElement;
-                      setTimeout(() => target.focus(), 0);
                     }}
                     data-field-id={ann.id}
                     data-form-field="true"
@@ -1540,7 +1547,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                       border: '3px solid #3B82F6',
                       outline: 'none',
                       backgroundColor: '#DBEAFE',
-                      fontSize: `${Math.min((ann.fontSize || 12) * pageScale, (ann.height * pageScale) * 0.55)}px`,
+                      fontSize: `${Math.max(Math.min((ann.fontSize || 12) * pageScale, (ann.height * pageScale) * 0.55), 16)}px`,
                       color: '#000000',
                       fontWeight: ann.groupId ? '600' : 'normal',
                       padding: ann.groupId ? '2px 1px' : '1px 3px',
@@ -1558,7 +1565,9 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                       lineHeight: `${ann.height * pageScale - 4}px`,
                       textAlign: ann.width < 40 ? 'center' : 'left',
                       WebkitUserSelect: 'text',
+                      userSelect: 'text',
                       WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+                      WebkitAppearance: 'none',
                       touchAction: 'manipulation',
                     }}
                     placeholder=""
@@ -1627,6 +1636,16 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                     onMouseDown={(e) => {
                       e.stopPropagation();
                     }}
+                    onTouchStart={(e) => {
+                      e.stopPropagation();
+                      // iOS: Focus must happen during touch event, not in setTimeout
+                      const target = e.target as HTMLInputElement;
+                      target.focus();
+                    }}
+                    onTouchEnd={(e) => {
+                      e.stopPropagation();
+                    }}
+                    data-form-field="true"
                     onFocus={(e) => {
                       e.target.style.backgroundColor = '#FFFFFF';
                       e.target.style.border = '3px solid #2563EB';
@@ -1641,7 +1660,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                       border: '1px solid rgba(99, 102, 241, 0.3)',
                       outline: 'none',
                       backgroundColor: 'transparent',
-                      fontSize: `${Math.min((ann.fontSize || 12) * pageScale, (ann.height * pageScale) * 0.6)}px`,
+                      fontSize: `${Math.max(Math.min((ann.fontSize || 12) * pageScale, (ann.height * pageScale) * 0.6), 16)}px`,
                       color: ann.textColor || '#000',
                       padding: '1px 3px',
                       boxSizing: 'border-box',
@@ -1658,7 +1677,9 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                       lineHeight: `${ann.height * pageScale - 4}px`,
                       textAlign: ann.width < 40 ? 'center' : 'left',
                       WebkitUserSelect: 'text',
+                      userSelect: 'text',
                       WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+                      WebkitAppearance: 'none',
                       touchAction: 'manipulation',
                     }}
                     placeholder=""
