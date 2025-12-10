@@ -325,7 +325,9 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
     try {
       setNumPages(numPages);
       // Automatically extract form fields on load (like Adobe Fill & Sign)
+      console.log('🔍 Starting form field extraction...');
       const extractedFields = await extractFormFields();
+      console.log('✅ Extracted fields:', extractedFields.length);
 
       // If no fields found with pdf-lib, try pdf.js annotation detection
       if (extractedFields.length === 0) {
@@ -334,6 +336,13 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       }
 
       setShowFormFields(true);
+
+      // Show debug alert on iOS to help diagnose
+      if (typeof window !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        setTimeout(() => {
+          alert(`DEBUG: Found ${extractedFields.length} form fields. Annotations: ${annotations.length}`);
+        }, 1000);
+      }
     } catch (error) {
       console.error('Error loading PDF:', error);
       alert('There was an error loading your PDF. Please try a different file or go back and try again.');
@@ -447,17 +456,29 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
   const extractFormFields = async () => {
     console.log('=== STARTING FORM FIELD EXTRACTION ===');
     try {
+      if (!file) {
+        console.error('❌ No file provided');
+        alert('ERROR: No PDF file loaded');
+        return [];
+      }
+
       const arrayBuffer = await file.arrayBuffer();
       console.log('PDF loaded, size:', arrayBuffer.byteLength, 'bytes');
 
+      if (typeof PDFDocument === 'undefined') {
+        console.error('❌ PDFDocument is undefined - pdf-lib not loaded');
+        alert('ERROR: PDF library not loaded. Please refresh the app.');
+        return [];
+      }
+
       const pdfDoc = await PDFDocument.load(arrayBuffer);
-      console.log('PDFDocument loaded');
+      console.log('✅ PDFDocument loaded successfully');
 
       const form = pdfDoc.getForm();
-      console.log('Form object:', form);
+      console.log('✅ Form object retrieved:', form ? 'exists' : 'null');
 
       const fields = form.getFields();
-      console.log('Total fields found:', fields.length);
+      console.log(`📊 Total fields found: ${fields.length}`);
 
       const extractedFields: FormField[] = [];
 
