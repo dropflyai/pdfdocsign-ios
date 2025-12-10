@@ -736,6 +736,12 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
   const convertFormFieldsToAnnotations = async (fields: FormField[]) => {
     console.log('=== CONVERTING FORM FIELDS TO ANNOTATIONS ===');
     console.log('Fields to convert:', fields.length);
+
+    // Show alert on iOS to help debug
+    if (typeof window !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+      alert(`Starting conversion of ${fields.length} fields...`);
+    }
+
     try {
       // We need the page dimensions to convert coordinates
       const arrayBuffer = await file.arrayBuffer();
@@ -938,11 +944,27 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       console.log('Total annotations created:', newAnnotations.length);
       console.log('Annotations:', newAnnotations);
 
+      // Show alert on iOS before setting state
+      if (typeof window !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        alert(`Conversion complete! Created ${newAnnotations.length} annotations. About to set state...`);
+      }
+
       // Replace all annotations with just the form fields
       setAnnotations(newAnnotations);
       console.log('Annotations state updated');
+
+      // Show final alert on iOS
+      if (typeof window !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        setTimeout(() => {
+          alert(`State updated! Annotations should now be: ${newAnnotations.length}`);
+        }, 500);
+      }
     } catch (error) {
       console.error('❌ Error converting form fields:', error);
+      // Show error alert on iOS
+      if (typeof window !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        alert(`ERROR in conversion: ${error instanceof Error ? error.message : String(error)}`);
+      }
     }
   };
 
