@@ -1012,6 +1012,58 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
     }
   };
 
+  const handlePdfTouch = (e: React.TouchEvent<HTMLDivElement>) => {
+    // Ignore touches during drag or resize operations, or immediately after
+    if (draggingId || resizingId || justFinishedResizingRef.current) {
+      return;
+    }
+
+    // Only handle single touch (not multi-touch gestures)
+    if (e.touches.length !== 1) {
+      return;
+    }
+
+    const touch = e.touches[0];
+    const rect = e.currentTarget.getBoundingClientRect();
+    // Convert touch position to PDF coordinate space by dividing by pageScale
+    const x = (touch.clientX - rect.left) / pageScale;
+    const y = (touch.clientY - rect.top) / pageScale;
+
+    // Handle text placement
+    if (selectedTool === 'text') {
+      e.preventDefault(); // Prevent default touch behavior
+      const newAnnotation: Annotation = {
+        id: Date.now().toString(),
+        type: 'text',
+        x,
+        y,
+        width: 200,
+        height: 30,
+        pageNumber: currentPage,
+        text: '',
+        fontSize: 14,
+        textColor: '#000000',
+      };
+
+      setAnnotations(prev => [...prev, newAnnotation]);
+
+      // Deselect tool after placing text
+      setSelectedTool('select');
+    }
+    // Handle signature placement
+    else if (selectedTool === 'signature') {
+      e.preventDefault(); // Prevent default touch behavior
+      // Store position and open modal
+      setPendingSignaturePos({ x, y });
+      setShowSignatureModal(true);
+    }
+    // Deselect any selected annotation when tapping on empty PDF area
+    else {
+      setSelectedAnnotation(null);
+      setSelectedSignatureId(null);
+    }
+  };
+
   const saveSignature = () => {
     if (!signaturePadRef.current || signaturePadRef.current.isEmpty() || !pendingSignaturePos) {
       alert('Please draw a signature first');
@@ -1475,6 +1527,14 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
             }
             handlePdfClick(e);
           }}
+          onTouchEnd={(e) => {
+            // Don't handle touches on form fields
+            const target = e.target as HTMLElement;
+            if (target.tagName === 'INPUT' || target.closest('[data-form-field="true"]')) {
+              return;
+            }
+            handlePdfTouch(e);
+          }}
           style={{
             cursor: selectedTool === 'signature' || selectedTool === 'text' ? 'crosshair' : 'default',
             transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoom})`,
@@ -1760,6 +1820,22 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                         }
                       }
                     }}
+                    onTouchStart={(e) => {
+                      // Start dragging from anywhere except the input field
+                      if (e.target !== e.currentTarget.querySelector('input')) {
+                        e.stopPropagation();
+                        if (pdfContainerRef.current && e.touches.length === 1) {
+                          const touch = e.touches[0];
+                          const annotationRect = e.currentTarget.getBoundingClientRect();
+                          setDraggingId(ann.id);
+                          setSelectedAnnotation(ann.id);
+                          setDragOffset({
+                            x: touch.clientX - annotationRect.left,
+                            y: touch.clientY - annotationRect.top
+                          });
+                        }
+                      }
+                    }}
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedAnnotation(ann.id);
@@ -1814,8 +1890,8 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                           position: 'absolute',
                           right: -6,
                           bottom: -6,
-                          width: 16,
-                          height: 16,
+                          width: 20,
+                          height: 20,
                           backgroundColor: '#6366f1',
                           border: '2px solid white',
                           borderRadius: '50%',
@@ -1834,6 +1910,20 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                             width: ann.width * pageScale,
                             height: ann.height * pageScale
                           });
+                        }}
+                        onTouchStart={(e) => {
+                          e.stopPropagation();
+                          if (e.touches.length === 1) {
+                            const touch = e.touches[0];
+                            setResizingId(ann.id);
+                            setSelectedAnnotation(ann.id);
+                            setResizeStart({
+                              x: touch.clientX,
+                              y: touch.clientY,
+                              width: ann.width * pageScale,
+                              height: ann.height * pageScale
+                            });
+                          }
                         }}
                       />
                     )}
@@ -1938,8 +2028,8 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                           position: 'absolute',
                           right: -6,
                           bottom: -6,
-                          width: 16,
-                          height: 16,
+                          width: 20,
+                          height: 20,
                           backgroundColor: '#6366f1',
                           border: '2px solid white',
                           borderRadius: '50%',
