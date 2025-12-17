@@ -6,3 +6,15 @@ build/
 *.log
 .env.local
 .vercel/
+
+# ================================
+# PROJECT-TEMPLATE Security
+# ================================
+# Credentials - NEVER commit these
+credentials/.env
+credentials/.env.local
+credentials/services/*.env
+
+# Verification artifacts
+/tmp/verification_*
+
