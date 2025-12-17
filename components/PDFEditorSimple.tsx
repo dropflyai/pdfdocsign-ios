@@ -992,11 +992,12 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
     }
 
     // Only handle single touch (not multi-touch gestures)
-    if (e.touches.length !== 1) {
+    // Use changedTouches for touchend event since touches array is empty at touch end
+    if (e.changedTouches.length !== 1) {
       return;
     }
 
-    const touch = e.touches[0];
+    const touch = e.changedTouches[0];
     const rect = e.currentTarget.getBoundingClientRect();
     // Convert touch position to PDF coordinate space by dividing by pageScale
     const x = (touch.clientX - rect.left) / pageScale;
