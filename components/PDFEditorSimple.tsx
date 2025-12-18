@@ -256,11 +256,18 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
         const newHeight = Math.max(30, resizeStart.height + deltaY) / pageScale;
 
         setAnnotations(prev =>
-          prev.map(ann =>
-            ann.id === resizingId
-              ? { ...ann, width: newWidth, height: newHeight }
-              : ann
-          )
+          prev.map(ann => {
+            if (ann.id === resizingId) {
+              // Scale fontSize proportionally to height change for text annotations
+              const updates: Partial<Annotation> = { width: newWidth, height: newHeight };
+              if (ann.type === 'text' && ann.fontSize) {
+                const heightRatio = newHeight / (resizeStart.height / pageScale);
+                updates.fontSize = Math.max(8, Math.min(72, ann.fontSize * heightRatio));
+              }
+              return { ...ann, ...updates };
+            }
+            return ann;
+          })
         );
       }
     };
@@ -1358,9 +1365,10 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
               )
             : rgb(0, 0, 0);
 
+          // Align text inside the box: text baseline should be textSize from bottom of box
           page.drawText(annotation.text, {
-            x: annotation.x,
-            y: height - annotation.y - textSize - 5,
+            x: annotation.x + 4,
+            y: height - annotation.y - annotation.height + textSize + 4,
             size: textSize,
             color: textRgb,
           });
@@ -1612,16 +1620,19 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                     data-form-field="true"
                     onFocus={(e) => {
                       e.target.style.backgroundColor = '#FFFFFF';
-                      e.target.style.border = '3px solid #2563EB';
+                      e.target.style.border = '2px solid #2563EB';
+                      e.target.style.boxShadow = '0 0 0 1px #2563EB';
                     }}
                     onBlur={(e) => {
                       e.target.style.backgroundColor = '#DBEAFE';
-                      e.target.style.border = '3px solid #3B82F6';
+                      e.target.style.border = '2px solid #3B82F6';
+                      e.target.style.boxShadow = '0 0 0 1px rgba(59, 130, 246, 0.5)';
                     }}
                     style={{
                       width: '100%',
                       height: '100%',
-                      border: '3px solid #3B82F6',
+                      border: '2px solid #3B82F6',
+                      boxShadow: '0 0 0 1px rgba(59, 130, 246, 0.5)',
                       outline: 'none',
                       backgroundColor: '#DBEAFE',
                       fontSize: `${Math.max(Math.min((ann.fontSize || 12) * pageScale, (ann.height * pageScale) * 0.55), 16)}px`,
@@ -1830,12 +1841,12 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                         e.stopPropagation();
                       }}
                       onFocus={(e) => {
-                        e.target.parentElement!.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
+                        e.target.parentElement!.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
                         e.target.parentElement!.style.border = '2px solid rgba(99, 102, 241, 0.8)';
                         setSelectedAnnotation(ann.id);
                       }}
                       onBlur={(e) => {
-                        e.target.parentElement!.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                        e.target.parentElement!.style.backgroundColor = 'transparent';
                         e.target.parentElement!.style.border = selectedAnnotation === ann.id ? '2px solid #6366f1' : '1px solid rgba(99, 102, 241, 0.5)';
                       }}
                       style={{
@@ -2197,10 +2208,10 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       {/* Signature Modal */}
       {showSignatureModal && (
         <div className="fixed inset-0 flex items-center justify-center" style={{ zIndex: 99999, backgroundColor: 'rgba(0, 0, 0, 0.15)' }}>
-          <div className="bg-white rounded-lg p-4 w-full mx-4 shadow-2xl border border-gray-300" style={{ maxWidth: '400px' }}>
-            <h3 className="text-base font-semibold mb-2 text-gray-800">Draw Your Signature</h3>
+          <div className="bg-white rounded-lg p-3 w-full mx-3 shadow-2xl border border-gray-300" style={{ maxWidth: '340px' }}>
+            <h3 className="text-sm font-semibold mb-2 text-gray-800">Draw Your Signature</h3>
             <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
-              <canvas ref={signatureCanvasRef} width={350} height={100} className="w-full" />
+              <canvas ref={signatureCanvasRef} width={300} height={120} className="w-full" style={{ touchAction: 'none' }} />
             </div>
             <div className="flex gap-3 mt-4">
               <button
