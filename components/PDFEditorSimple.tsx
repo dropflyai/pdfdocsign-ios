@@ -911,6 +911,11 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
             }
           } else {
             // Checkbox, radio, dropdown, or narrow text field - create as normal
+            // Default unknown field types to 'text' so they render properly
+            const normalizedFieldType = field.type === 'unknown' || !field.type
+              ? 'text'
+              : field.type as 'text' | 'checkbox' | 'radio' | 'dropdown';
+
             const annotation = {
               id: `formfield-${field.name}-${Date.now()}`,
               type: 'formfield' as const,
@@ -922,7 +927,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
               text: field.type === 'checkbox' ? (field.value === 'Yes' ? '☑' : '☐') : '',
               fieldName: field.name,
               isFormField: true,
-              fieldType: field.type as 'text' | 'checkbox' | 'radio' | 'dropdown',
+              fieldType: normalizedFieldType,
               isChecked: field.type === 'checkbox' && field.value === 'Yes',
               fontSize: Math.min(12, height * 0.7),
               textColor: '#000000',
