@@ -1640,7 +1640,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                       boxShadow: '0 0 0 1px rgba(59, 130, 246, 0.5)',
                       outline: 'none',
                       backgroundColor: '#DBEAFE',
-                      fontSize: `${Math.max(Math.min((ann.fontSize || 12) * pageScale, (ann.height * pageScale) * 0.55), 16)}px`,
+                      fontSize: `${Math.max(Math.min((ann.fontSize || 12) * pageScale, (ann.height * pageScale) * 0.55), 10)}px`,
                       color: '#000000',
                       fontWeight: ann.groupId ? '600' : 'normal',
                       padding: ann.groupId ? '2px 1px' : '1px 3px',
@@ -1917,38 +1917,85 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                         }}
                       />
                     )}
-                    {/* Delete button */}
+                    {/* Action icons - delete and accept */}
                     {selectedAnnotation === ann.id && !draggingId && !resizingId && (
-                      <button
-                        onMouseDown={(e) => {
-                          e.stopPropagation();
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          setAnnotations(prev => prev.filter(a => a.id !== ann.id));
-                          setSelectedAnnotation(null);
-                        }}
-                        style={{
-                          position: 'absolute',
-                          top: -40,
-                          right: 0,
-                          padding: '8px 16px',
-                          backgroundColor: '#ef4444',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '8px',
-                          fontSize: '13px',
-                          fontWeight: '600',
-                          cursor: 'pointer',
-                          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                          whiteSpace: 'nowrap',
-                          zIndex: 10000,
-                          pointerEvents: 'auto',
-                        }}
-                      >
-                        🗑️ Delete
-                      </button>
+                      <div style={{
+                        position: 'absolute',
+                        top: -32,
+                        right: 0,
+                        display: 'flex',
+                        gap: '4px',
+                        zIndex: 10000,
+                      }}>
+                        {/* Accept/Check icon */}
+                        <button
+                          onMouseDown={(e) => e.stopPropagation()}
+                          onTouchStart={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            setSelectedAnnotation(null);
+                          }}
+                          onTouchEnd={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            setSelectedAnnotation(null);
+                          }}
+                          style={{
+                            width: '28px',
+                            height: '28px',
+                            padding: '0',
+                            backgroundColor: '#10b981',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            fontSize: '16px',
+                            cursor: 'pointer',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            pointerEvents: 'auto',
+                          }}
+                        >
+                          ✓
+                        </button>
+                        {/* Delete icon */}
+                        <button
+                          onMouseDown={(e) => e.stopPropagation()}
+                          onTouchStart={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            setAnnotations(prev => prev.filter(a => a.id !== ann.id));
+                            setSelectedAnnotation(null);
+                          }}
+                          onTouchEnd={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            setAnnotations(prev => prev.filter(a => a.id !== ann.id));
+                            setSelectedAnnotation(null);
+                          }}
+                          style={{
+                            width: '28px',
+                            height: '28px',
+                            padding: '0',
+                            backgroundColor: '#ef4444',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            fontSize: '16px',
+                            cursor: 'pointer',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            pointerEvents: 'auto',
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </div>
                     )}
                   </div>
                 )}
