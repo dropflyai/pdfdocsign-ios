@@ -1569,8 +1569,11 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                   top: ann.fieldType === 'checkbox' ? (ann.y * pageScale) - 6 : ann.y * pageScale,
                   width: ann.fieldType === 'checkbox' ? Math.max(ann.width * pageScale, 24) : ann.width * pageScale,
                   height: ann.fieldType === 'checkbox' ? Math.max(ann.height * pageScale, 24) : ann.height * pageScale,
-                  minWidth: '44px',
-                  minHeight: '44px',
+                  // Mobile-only: 44px touch targets for iOS accessibility
+                  ...(typeof window !== 'undefined' && window.innerWidth < 768 ? {
+                    minWidth: '44px',
+                    minHeight: '44px',
+                  } : {}),
                   padding: '0',
                   pointerEvents: 'auto',
                   zIndex: 1000,
