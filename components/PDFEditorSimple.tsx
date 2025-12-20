@@ -981,6 +981,11 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
 
       setAnnotations(prev => [...prev, newAnnotation]);
 
+      // Auto-zoom to placed annotation
+      if (zoom < 1.8) {
+        setZoom(1.8);
+      }
+
       // Deselect tool after placing text
       setSelectedTool('select');
     }
@@ -989,6 +994,11 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       // Store position and open modal
       setPendingSignaturePos({ x, y });
       setShowSignatureModal(true);
+
+      // Auto-zoom for signature
+      if (zoom < 1.8) {
+        setZoom(1.8);
+      }
     }
     // Deselect any selected annotation when clicking on empty PDF area
     else {
@@ -1033,6 +1043,11 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
 
       setAnnotations(prev => [...prev, newAnnotation]);
 
+      // Auto-zoom to placed annotation
+      if (zoom < 1.8) {
+        setZoom(1.8);
+      }
+
       // Deselect tool after placing text
       setSelectedTool('select');
     }
@@ -1042,6 +1057,11 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       // Store position and open modal
       setPendingSignaturePos({ x, y });
       setShowSignatureModal(true);
+
+      // Auto-zoom for signature
+      if (zoom < 1.8) {
+        setZoom(1.8);
+      }
     }
     // Deselect any selected annotation when tapping on empty PDF area
     else {
@@ -1625,19 +1645,19 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                     data-form-field="true"
                     onFocus={(e) => {
                       e.target.style.backgroundColor = '#FFFFFF';
-                      e.target.style.border = '2px solid #2563EB';
-                      e.target.style.boxShadow = '0 0 0 1px #2563EB';
+                      e.target.style.border = '1px solid #2563EB';
+                      e.target.style.boxShadow = 'none';
                     }}
                     onBlur={(e) => {
                       e.target.style.backgroundColor = '#DBEAFE';
-                      e.target.style.border = '2px solid #3B82F6';
-                      e.target.style.boxShadow = '0 0 0 1px rgba(59, 130, 246, 0.5)';
+                      e.target.style.border = '0.5px solid #3B82F6';
+                      e.target.style.boxShadow = 'none';
                     }}
                     style={{
                       width: '100%',
                       height: '100%',
-                      border: '2px solid #3B82F6',
-                      boxShadow: '0 0 0 1px rgba(59, 130, 246, 0.5)',
+                      border: '0.5px solid #3B82F6',
+                      boxShadow: 'none',
                       outline: 'none',
                       backgroundColor: '#DBEAFE',
                       fontSize: `${Math.max(Math.min((ann.fontSize || 12) * pageScale, (ann.height * pageScale) * 0.55), 10)}px`,
@@ -1645,7 +1665,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                       fontWeight: ann.groupId ? '600' : 'normal',
                       padding: ann.groupId ? '2px 1px' : '1px 3px',
                       boxSizing: 'border-box',
-                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      fontFamily: 'Helvetica, Arial, sans-serif',
                       transition: 'all 0.15s ease',
                       cursor: 'text',
                       pointerEvents: 'auto',
@@ -1788,8 +1808,8 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                       width: '100%',
                       height: '100%',
                       position: 'relative',
-                      border: selectedAnnotation === ann.id ? '2px solid #6366f1' : 'none',
-                      borderRadius: '3px',
+                      border: selectedAnnotation === ann.id ? '0.5px solid #6366f1' : 'none',
+                      borderRadius: '2px',
                       backgroundColor: selectedAnnotation === ann.id ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
                       padding: '4px',
                       boxSizing: 'border-box',
@@ -1847,12 +1867,12 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                       }}
                       onFocus={(e) => {
                         e.target.parentElement!.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
-                        e.target.parentElement!.style.border = '2px solid rgba(99, 102, 241, 0.8)';
+                        e.target.parentElement!.style.border = '0.5px solid rgba(99, 102, 241, 0.8)';
                         setSelectedAnnotation(ann.id);
                       }}
                       onBlur={(e) => {
                         e.target.parentElement!.style.backgroundColor = 'transparent';
-                        e.target.parentElement!.style.border = selectedAnnotation === ann.id ? '2px solid #6366f1' : '1px solid rgba(99, 102, 241, 0.5)';
+                        e.target.parentElement!.style.border = selectedAnnotation === ann.id ? '0.5px solid #6366f1' : 'none';
                       }}
                       style={{
                         width: '100%',
@@ -1864,7 +1884,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                         color: ann.textColor || '#000',
                         padding: '2px 4px',
                         boxSizing: 'border-box',
-                        fontFamily: 'system-ui, -apple-system, sans-serif',
+                        fontFamily: 'Helvetica, Arial, sans-serif',
                         cursor: 'text',
                         pointerEvents: 'auto',
                         zIndex: 1001,
