@@ -771,15 +771,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
           const pageHeight = page.getSize().height;
 
           // Convert PDF coordinates (bottom-left origin) to canvas coordinates (top-left origin)
-          let canvasY = pageHeight - y - height;
-
-          // Only shift upward for single-line text fields (not digit boxes)
-          // Digit boxes (height > 20) and wide fields should stay in their original position
-          const isDigitBox = height > 20 || (width < height * 2);
-          if (!isDigitBox) {
-            // Shift boxes upward so the bottom border sits on the line
-            canvasY = canvasY - (height * 0.5);
-          }
+          const canvasY = pageHeight - y - height;
 
           // For text fields, check if we should split into individual digit boxes
           if (field.type === 'text') {
