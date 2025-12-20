@@ -774,7 +774,8 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
           const canvasY = pageHeight - y - height;
 
           // For text fields, check if we should split into individual digit boxes
-          if (field.type === 'text') {
+          // Note: pdf-lib uses 'e' for editable text fields
+          if (field.type === 'text' || field.type === 'e') {
             let boxCount = 0;
 
             // Priority 1: Check configuration for this specific field
@@ -904,7 +905,8 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
           } else {
             // Checkbox, radio, dropdown, or narrow text field - create as normal
             // Default unknown field types to 'text' so they render properly
-            const normalizedFieldType = field.type === 'unknown' || !field.type
+            // Note: pdf-lib uses 'e' for editable text fields
+            const normalizedFieldType = field.type === 'unknown' || !field.type || field.type === 'e'
               ? 'text'
               : field.type as 'text' | 'checkbox' | 'radio' | 'dropdown';
 
