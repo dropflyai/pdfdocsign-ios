@@ -973,11 +973,6 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
 
       setAnnotations(prev => [...prev, newAnnotation]);
 
-      // Auto-zoom to placed annotation
-      if (zoom < 1.8) {
-        setZoom(1.8);
-      }
-
       // Deselect tool after placing text
       setSelectedTool('select');
     }
@@ -987,10 +982,6 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       setPendingSignaturePos({ x, y });
       setShowSignatureModal(true);
 
-      // Auto-zoom for signature
-      if (zoom < 1.8) {
-        setZoom(1.8);
-      }
     }
     // Deselect any selected annotation when clicking on empty PDF area
     else {
@@ -1035,11 +1026,6 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
 
       setAnnotations(prev => [...prev, newAnnotation]);
 
-      // Auto-zoom to placed annotation
-      if (zoom < 1.8) {
-        setZoom(1.8);
-      }
-
       // Deselect tool after placing text
       setSelectedTool('select');
     }
@@ -1050,10 +1036,6 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       setPendingSignaturePos({ x, y });
       setShowSignatureModal(true);
 
-      // Auto-zoom for signature
-      if (zoom < 1.8) {
-        setZoom(1.8);
-      }
     }
     // Deselect any selected annotation when tapping on empty PDF area
     else {
@@ -1561,7 +1543,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
           >
             <Page
               pageNumber={currentPage}
-              width={Math.min(window.innerWidth - 48, 800)}
+              width={Math.min(Math.max(window.innerWidth - 48, 600), 800)}
               renderTextLayer={false}
               renderAnnotationLayer={false}
               onRenderSuccess={(page) => {
@@ -1585,6 +1567,8 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                   top: ann.fieldType === 'checkbox' ? (ann.y * pageScale) - 6 : ann.y * pageScale,
                   width: ann.fieldType === 'checkbox' ? Math.max(ann.width * pageScale, 24) : ann.width * pageScale,
                   height: ann.fieldType === 'checkbox' ? Math.max(ann.height * pageScale, 24) : ann.height * pageScale,
+                  minWidth: '44px',
+                  minHeight: '44px',
                   padding: '0',
                   pointerEvents: 'auto',
                   zIndex: 1000,
@@ -1652,7 +1636,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                       boxShadow: 'none',
                       outline: 'none',
                       backgroundColor: '#DBEAFE',
-                      fontSize: `${Math.max(Math.min((ann.fontSize || 12) * pageScale, (ann.height * pageScale) * 0.65), 7)}px`,
+                      fontSize: `${Math.max(Math.min((ann.fontSize || 12) * pageScale, (ann.height * pageScale) * 0.65), 16)}px`,
                       color: '#000000',
                       fontWeight: 'normal',
                       padding: ann.groupId ? '0px 1px' : '1px 2px',
