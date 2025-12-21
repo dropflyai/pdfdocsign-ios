@@ -1670,7 +1670,6 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                     placeholder=""
                     autoComplete="off"
                     tabIndex={0}
-                    maxLength={ann.width < 40 ? 1 : undefined}
                   />
                 )}
                 {/* Render checkboxes */}
@@ -1782,7 +1781,6 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                     placeholder=""
                     autoComplete="off"
                     tabIndex={0}
-                    maxLength={ann.width < 40 ? 1 : undefined}
                   />
                 )}
                 {/* Render manually-placed text annotations */}
