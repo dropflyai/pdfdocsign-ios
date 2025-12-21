@@ -495,7 +495,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
           const fieldConstructor = field.constructor.name;
           console.log('  Field type:', fieldConstructor);
 
-          if (fieldConstructor === 'PDFTextField') {
+          if (fieldConstructor === 'PDFTextField' || fieldConstructor === 'e') {
             const textField = form.getTextField(fieldName);
             fieldValue = textField.getText() || '';
             fieldType = 'text';
@@ -1583,6 +1583,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                 {ann.type === 'formfield' && ann.isFormField && ann.fieldType === 'text' && (
                   <input
                     type="text"
+                    maxLength={ann.groupId ? 1 : undefined}
                     value={ann.text || ''}
                     onChange={(e) => {
                       const newValue = e.target.value;
