@@ -1808,51 +1808,44 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                 {/* Render manually-placed text annotations */}
                 {ann.type === 'text' && !ann.isFormField && (
                   <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedAnnotation(ann.id);
+                    }}
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      setDraggingId(ann.id);
+                      setSelectedAnnotation(ann.id);
+                      setDragOffset({
+                        x: e.clientX - rect.left,
+                        y: e.clientY - rect.top
+                      });
+                    }}
+                    onTouchStart={(e) => {
+                      e.stopPropagation();
+                      const touch = e.touches[0];
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      setDraggingId(ann.id);
+                      setSelectedAnnotation(ann.id);
+                      setDragOffset({
+                        x: touch.clientX - rect.left,
+                        y: touch.clientY - rect.top
+                      });
+                    }}
                     style={{
                       width: '100%',
                       height: '100%',
                       position: 'relative',
-                      border: selectedAnnotation === ann.id ? '0.5px solid #6366f1' : 'none',
+                      cursor: draggingId === ann.id ? 'grabbing' : 'grab',
+                      pointerEvents: 'auto',
+                      border: (draggingId === ann.id || resizingId === ann.id || selectedAnnotation === ann.id)
+                        ? '2px solid #6366f1'
+                        : '1px dashed rgba(99, 102, 241, 0.3)',
                       borderRadius: '2px',
-                      backgroundColor: selectedAnnotation === ann.id ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+                      backgroundColor: 'transparent',
                       padding: '4px',
                       boxSizing: 'border-box',
-                      cursor: selectedAnnotation === ann.id ? 'move' : 'default',
-                    }}
-                    onMouseDown={(e) => {
-                      // Start dragging from anywhere except the input field
-                      if (e.target !== e.currentTarget.querySelector('input')) {
-                        e.stopPropagation();
-                        if (pdfContainerRef.current) {
-                          const annotationRect = e.currentTarget.getBoundingClientRect();
-                          setDraggingId(ann.id);
-                          setSelectedAnnotation(ann.id);
-                          setDragOffset({
-                            x: e.clientX - annotationRect.left,
-                            y: e.clientY - annotationRect.top
-                          });
-                        }
-                      }
-                    }}
-                    onTouchStart={(e) => {
-                      // Start dragging from anywhere except the input field
-                      if (e.target !== e.currentTarget.querySelector('input')) {
-                        e.stopPropagation();
-                        if (pdfContainerRef.current && e.touches.length === 1) {
-                          const touch = e.touches[0];
-                          const annotationRect = e.currentTarget.getBoundingClientRect();
-                          setDraggingId(ann.id);
-                          setSelectedAnnotation(ann.id);
-                          setDragOffset({
-                            x: touch.clientX - annotationRect.left,
-                            y: touch.clientY - annotationRect.top
-                          });
-                        }
-                      }
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedAnnotation(ann.id);
                     }}
                   >
                     <input
@@ -1866,17 +1859,12 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                         setSelectedAnnotation(ann.id);
                       }}
                       onMouseDown={(e) => {
-                        // Prevent drag from starting when clicking in input
+                        // Stop drag propagation so clicking input focuses it instead of dragging
                         e.stopPropagation();
                       }}
-                      onFocus={(e) => {
-                        e.target.parentElement!.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
-                        e.target.parentElement!.style.border = '0.5px solid rgba(99, 102, 241, 0.8)';
-                        setSelectedAnnotation(ann.id);
-                      }}
-                      onBlur={(e) => {
-                        e.target.parentElement!.style.backgroundColor = 'transparent';
-                        e.target.parentElement!.style.border = selectedAnnotation === ann.id ? '0.5px solid #6366f1' : 'none';
+                      onTouchStart={(e) => {
+                        // Stop drag propagation for touch
+                        e.stopPropagation();
                       }}
                       style={{
                         width: '100%',
