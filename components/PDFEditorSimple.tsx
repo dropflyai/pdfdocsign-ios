@@ -1297,6 +1297,8 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       }
 
       // Then, update regular form field values
+      let regularFieldCount = 0;
+      let checkboxCount = 0;
       for (const annotation of annotations) {
         if (annotation.type === 'formfield' && annotation.fieldName && annotation.isFormField && !annotation.groupId) {
           try {
@@ -1309,13 +1311,18 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                 textField.setText(annotation.text || '');
                 // Make the field read-only to prevent editing
                 textField.enableReadOnly();
+                regularFieldCount++;
+                console.log(`  ✓ Set text field ${annotation.fieldName} = "${annotation.text}"`);
               } else if (fieldConstructor === 'PDFCheckBox') {
                 const checkBox = form.getCheckBox(annotation.fieldName);
                 if (annotation.isChecked) {
                   checkBox.check();
+                  console.log(`  ✓ Checked checkbox ${annotation.fieldName}`);
                 } else {
                   checkBox.uncheck();
+                  console.log(`  ✓ Unchecked checkbox ${annotation.fieldName}`);
                 }
+                checkboxCount++;
               }
             }
           } catch (err) {
@@ -1323,8 +1330,12 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
           }
         }
       }
+      console.log(`Updated ${regularFieldCount} text fields and ${checkboxCount} checkboxes`);
 
       // Then, add other annotations (text, signatures, erasers, and editable text)
+      let textAnnotationCount = 0;
+      let signatureCount = 0;
+      let eraserCount = 0;
       for (const annotation of annotations) {
         const page = pages[annotation.pageNumber - 1];
         if (!page) continue;
@@ -1335,6 +1346,8 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
         if (annotation.type === 'formfield' && annotation.isFormField) {
           continue;
         } else if (annotation.type === 'eraser') {
+          eraserCount++;
+          console.log(`  ✓ Drawing eraser at (${annotation.x}, ${annotation.y})`);
           // Draw white rectangle to cover existing content
           page.drawRectangle({
             x: annotation.x,
@@ -1395,7 +1408,11 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
             size: textSize,
             color: textRgb,
           });
+          textAnnotationCount++;
+          console.log(`  ✓ Drew text annotation "${annotation.text}" at (${annotation.x}, ${annotation.y})`);
         } else if (annotation.type === 'signature' && annotation.imageData) {
+          signatureCount++;
+          console.log(`  ✓ Drawing signature at (${annotation.x}, ${annotation.y})`);
           const imageBytes = Uint8Array.from(
             atob(annotation.imageData.split(',')[1]),
             (c) => c.charCodeAt(0)
@@ -1409,8 +1426,11 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
           });
         }
       }
+      console.log(`Drew ${textAnnotationCount} text annotations, ${signatureCount} signatures, ${eraserCount} erasers`);
 
+      console.log('=== SAVING PDF ===');
       const pdfBytes = await pdfDoc.save();
+      console.log(`PDF saved: ${pdfBytes.length} bytes`);
       const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
