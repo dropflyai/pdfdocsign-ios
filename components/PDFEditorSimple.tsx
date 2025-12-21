@@ -1332,6 +1332,11 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       }
       console.log(`Updated ${regularFieldCount} text fields and ${checkboxCount} checkboxes`);
 
+      // CRITICAL: Update form field appearances so values are visible in the PDF
+      // Without this, field values are set in the data but not rendered visually
+      form.updateFieldAppearances();
+      console.log('✓ Updated form field appearances');
+
       // Then, add other annotations (text, signatures, erasers, and editable text)
       let textAnnotationCount = 0;
       let signatureCount = 0;
