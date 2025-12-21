@@ -1282,15 +1282,9 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
         try {
           const fullValue = group.digits.join('');
           console.log(`Setting grouped field ${groupId} to: "${fullValue}"`);
-          const field = form.getFieldMaybe(groupId);
-          if (field && field.constructor.name === 'PDFTextField') {
-            const textField = form.getTextField(groupId);
-            textField.setText(fullValue);
-            textField.enableReadOnly();
-            console.log(`  ✓ Successfully set ${groupId}`);
-          } else {
-            console.warn(`  ✗ Field ${groupId} not found or not a text field`);
-          }
+          const textField = form.getTextField(groupId);
+          textField.setText(fullValue);
+          console.log(`  ✓ Successfully set ${groupId} to "${fullValue}"`);
         } catch (err) {
           console.warn(`Could not update grouped field ${groupId}:`, err);
         }
@@ -1301,33 +1295,34 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       let checkboxCount = 0;
       for (const annotation of annotations) {
         if (annotation.type === 'formfield' && annotation.fieldName && annotation.isFormField && !annotation.groupId) {
+          // Try checkbox first (most specific type)
           try {
-            const field = form.getFieldMaybe(annotation.fieldName);
-            if (field) {
-              const fieldConstructor = field.constructor.name;
-              if (fieldConstructor === 'PDFTextField') {
-                const textField = form.getTextField(annotation.fieldName);
-                // Set the form field value
-                textField.setText(annotation.text || '');
-                // Make the field read-only to prevent editing
-                textField.enableReadOnly();
-                regularFieldCount++;
-                console.log(`  ✓ Set text field ${annotation.fieldName} = "${annotation.text}"`);
-              } else if (fieldConstructor === 'PDFCheckBox') {
-                const checkBox = form.getCheckBox(annotation.fieldName);
-                if (annotation.isChecked) {
-                  checkBox.check();
-                  console.log(`  ✓ Checked checkbox ${annotation.fieldName}`);
-                } else {
-                  checkBox.uncheck();
-                  console.log(`  ✓ Unchecked checkbox ${annotation.fieldName}`);
-                }
-                checkboxCount++;
-              }
+            const checkBox = form.getCheckBox(annotation.fieldName);
+            if (annotation.isChecked) {
+              checkBox.check();
+              console.log(`  ✓ Checked checkbox ${annotation.fieldName}`);
+            } else {
+              checkBox.uncheck();
+              console.log(`  ✓ Unchecked checkbox ${annotation.fieldName}`);
             }
+            checkboxCount++;
+            continue; // Successfully handled as checkbox
           } catch (err) {
-            console.warn(`Could not update field ${annotation.fieldName}:`, err);
+            // Not a checkbox, try text field
           }
+
+          // Try text field
+          try {
+            const textField = form.getTextField(annotation.fieldName);
+            textField.setText(annotation.text || '');
+            regularFieldCount++;
+            console.log(`  ✓ Set text field ${annotation.fieldName} = "${annotation.text}"`);
+            continue; // Successfully handled as text field
+          } catch (err) {
+            // Not a text field
+          }
+
+          console.warn(`Could not determine type for field ${annotation.fieldName}`);
         }
       }
       console.log(`Updated ${regularFieldCount} text fields and ${checkboxCount} checkboxes`);
@@ -1406,10 +1401,11 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
               )
             : rgb(0, 0, 0);
 
-          // Align text inside the box: text baseline should be textSize from bottom of box
+          // Position text baseline slightly above bottom of box
+          // PDF coords are bottom-left origin, so we convert from canvas top-left origin
           page.drawText(annotation.text, {
             x: annotation.x + 4,
-            y: height - annotation.y - annotation.height + textSize + 4,
+            y: height - annotation.y - annotation.height + 8, // Small offset for baseline positioning
             size: textSize,
             color: textRgb,
           });
