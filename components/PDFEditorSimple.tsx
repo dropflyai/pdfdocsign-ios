@@ -493,25 +493,47 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
         try {
           // Try to get value based on field type
           const fieldConstructor = field.constructor.name;
-          console.log('  Field type:', fieldConstructor);
+          console.log('  Field constructor:', fieldConstructor);
 
-          if (fieldConstructor === 'PDFTextField' || fieldConstructor === 'e') {
-            const textField = form.getTextField(fieldName);
-            fieldValue = textField.getText() || '';
-            fieldType = 'text';
-          } else if (fieldConstructor === 'PDFCheckBox') {
+          // IMPORTANT: constructor.name is unreliable in minified/bundled code
+          // Try each field type method to detect the actual type
+
+          // Try checkbox first (most specific)
+          try {
             const checkBox = form.getCheckBox(fieldName);
             fieldValue = checkBox.isChecked() ? 'Yes' : 'No';
             fieldType = 'checkbox';
-          } else if (fieldConstructor === 'PDFDropdown') {
-            const dropdown = form.getDropdown(fieldName);
-            const selected = dropdown.getSelected();
-            fieldValue = selected ? selected.join(', ') : '';
-            fieldType = 'dropdown';
-          } else if (fieldConstructor === 'PDFRadioGroup') {
-            const radioGroup = form.getRadioGroup(fieldName);
-            fieldValue = radioGroup.getSelected() || '';
-            fieldType = 'radio';
+            console.log('  ✓ Detected as checkbox');
+          } catch (e) {
+            // Not a checkbox, try other types
+
+            // Try radio group
+            try {
+              const radioGroup = form.getRadioGroup(fieldName);
+              fieldValue = radioGroup.getSelected() || '';
+              fieldType = 'radio';
+              console.log('  ✓ Detected as radio');
+            } catch (e) {
+              // Not a radio, try dropdown
+              try {
+                const dropdown = form.getDropdown(fieldName);
+                const selected = dropdown.getSelected();
+                fieldValue = selected ? selected.join(', ') : '';
+                fieldType = 'dropdown';
+                console.log('  ✓ Detected as dropdown');
+              } catch (e) {
+                // Not a dropdown, default to text field
+                try {
+                  const textField = form.getTextField(fieldName);
+                  fieldValue = textField.getText() || '';
+                  fieldType = 'text';
+                  console.log('  ✓ Detected as text');
+                } catch (e) {
+                  console.log('  ⚠️ Could not detect field type, defaulting to text');
+                  fieldType = 'text';
+                }
+              }
+            }
           }
 
           // Get field widget (location info)
