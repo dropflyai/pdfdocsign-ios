@@ -6,8 +6,8 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import SignaturePad from 'signature_pad';
 import { usePremium } from '@/contexts/PremiumContext';
 
-// iOS WebKit fix: Use HTTPS CDN for worker
-pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
+// Mobile fix: Use local worker file instead of CDN to avoid loading issues on iOS/mobile
+pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
 interface PDFEditorProps {
   file: File;
