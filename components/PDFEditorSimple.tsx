@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import SignaturePad from 'signature_pad';
 import { usePremium } from '@/contexts/PremiumContext';
 
@@ -1329,8 +1329,10 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
 
       // CRITICAL: Update form field appearances so values are visible in the PDF
       // Without this, field values are set in the data but not rendered visually
-      form.updateFieldAppearances();
-      console.log('✓ Updated form field appearances');
+      // Embed standard Helvetica font to ensure consistent rendering across all platforms
+      const helveticaFont = await pdfDoc.embedStandardFont(StandardFonts.Helvetica);
+      form.updateFieldAppearances(helveticaFont);
+      console.log('✓ Updated form field appearances with Helvetica font');
 
       // Then, add other annotations (text, signatures, erasers, and editable text)
       let textAnnotationCount = 0;
