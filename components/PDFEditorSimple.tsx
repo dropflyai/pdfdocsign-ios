@@ -1287,9 +1287,13 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
           console.log(`Setting grouped field ${groupId} to: "${fullValue}"`);
           const textField = form.getTextField(groupId);
           textField.setText(fullValue);
-          // Update appearance with black text
+          // Manually set Default Appearance (DA) string with black color
+          // Format: "0 0 0 rg /FontName FontSize Tf" where 0 0 0 rg = black RGB
+          const acroField = textField.acroField;
+          acroField.setDefaultAppearance('0 0 0 rg /Helv 12 Tf');
+          // Now update appearance to apply the new DA string
           textField.updateAppearances(helveticaFont);
-          console.log(`  ✓ Successfully set ${groupId} to "${fullValue}"`);
+          console.log(`  ✓ Successfully set ${groupId} to "${fullValue}" with black color`);
         } catch (err) {
           console.warn(`Could not update grouped field ${groupId}:`, err);
         }
@@ -1320,10 +1324,15 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
           try {
             const textField = form.getTextField(annotation.fieldName);
             textField.setText(annotation.text || '');
-            // Update appearance with Helvetica font (forces black text color)
+            // Manually set Default Appearance (DA) string with black color
+            // Format: "0 0 0 rg /FontName FontSize Tf" where 0 0 0 rg = black RGB
+            const acroField = textField.acroField;
+            const fontSize = annotation.fontSize || 12;
+            acroField.setDefaultAppearance(`0 0 0 rg /Helv ${fontSize} Tf`);
+            // Now update appearance to apply the new DA string
             textField.updateAppearances(helveticaFont);
             regularFieldCount++;
-            console.log(`  ✓ Set text field ${annotation.fieldName} = "${annotation.text}"`);
+            console.log(`  ✓ Set text field ${annotation.fieldName} = "${annotation.text}" with black color`);
             continue; // Successfully handled as text field
           } catch (err) {
             // Not a text field
