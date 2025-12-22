@@ -51,6 +51,28 @@ const FORM_FIELD_CONFIGS: { [formType: string]: FieldSplitConfig } = {
   }
 };
 
+// Helper function to detect if a field should use numeric keyboard
+const shouldUseNumericKeyboard = (fieldName: string, groupId?: string): boolean => {
+  // All grouped fields (SSN/EIN digit boxes) should be numeric
+  if (groupId) return true;
+
+  // Check field name for numeric patterns
+  const lowerName = fieldName.toLowerCase();
+  return (
+    lowerName.includes('ssn') ||
+    lowerName.includes('ein') ||
+    lowerName.includes('phone') ||
+    lowerName.includes('fax') ||
+    lowerName.includes('zip') ||
+    lowerName.includes('postal') ||
+    lowerName.includes('number') ||
+    lowerName.includes('amount') ||
+    lowerName.includes('year') ||
+    lowerName.includes('date') ||
+    lowerName.match(/f1_\d+/) !== null  // IRS form fields like f1_11, f1_12, etc.
+  );
+};
+
 interface FormField {
   name: string;
   value: string;
@@ -1650,6 +1672,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                 {ann.type === 'formfield' && ann.isFormField && ann.fieldType === 'text' && (
                   <input
                     type="text"
+                    inputMode={shouldUseNumericKeyboard(ann.fieldName || '', ann.groupId) ? 'numeric' : 'text'}
                     maxLength={ann.groupId ? 1 : undefined}
                     value={ann.text || ''}
                     onChange={(e) => {
