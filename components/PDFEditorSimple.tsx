@@ -1636,7 +1636,8 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                   width: ann.fieldType === 'checkbox' ? Math.max(ann.width * pageScale, 24) : ann.width * pageScale,
                   height: ann.fieldType === 'checkbox' ? Math.max(ann.height * pageScale, 24) : ann.height * pageScale,
                   // Mobile-only: 44px touch targets for iOS accessibility
-                  ...(typeof window !== 'undefined' && window.innerWidth < 768 ? {
+                  // BUT: only apply to checkboxes and non-grouped fields (not SSN/EIN digit boxes)
+                  ...(typeof window !== 'undefined' && window.innerWidth < 768 && ann.fieldType === 'checkbox' ? {
                     minWidth: '44px',
                     minHeight: '44px',
                   } : {}),
