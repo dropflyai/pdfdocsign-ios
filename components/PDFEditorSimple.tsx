@@ -1663,9 +1663,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                 {/* Render text fields */}
                 {ann.type === 'formfield' && ann.isFormField && ann.fieldType === 'text' && (
                   <input
-                    type="text"
-                    inputMode={shouldUseNumericKeyboard(ann.fieldName || '', ann.groupId) ? 'numeric' : 'text'}
-                    pattern={shouldUseNumericKeyboard(ann.fieldName || '', ann.groupId) ? '[0-9]*' : undefined}
+                    type={shouldUseNumericKeyboard(ann.fieldName || '', ann.groupId) ? 'tel' : 'text'}
                     maxLength={ann.groupId ? 1 : undefined}
                     value={ann.text || ''}
                     onChange={(e) => {
