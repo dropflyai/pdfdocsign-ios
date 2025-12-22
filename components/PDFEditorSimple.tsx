@@ -1277,6 +1277,9 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       }
       console.log(`Total grouped fields found: ${groupedFields.size}`);
 
+      // Embed Helvetica font first so we can use it for field appearances
+      const helveticaFont = await pdfDoc.embedStandardFont(StandardFonts.Helvetica);
+
       // Set the reconstructed values for grouped fields
       for (const [groupId, group] of groupedFields) {
         try {
@@ -1284,6 +1287,8 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
           console.log(`Setting grouped field ${groupId} to: "${fullValue}"`);
           const textField = form.getTextField(groupId);
           textField.setText(fullValue);
+          // Update appearance with black text
+          textField.updateAppearances(helveticaFont);
           console.log(`  ✓ Successfully set ${groupId} to "${fullValue}"`);
         } catch (err) {
           console.warn(`Could not update grouped field ${groupId}:`, err);
@@ -1315,6 +1320,8 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
           try {
             const textField = form.getTextField(annotation.fieldName);
             textField.setText(annotation.text || '');
+            // Update appearance with Helvetica font (forces black text color)
+            textField.updateAppearances(helveticaFont);
             regularFieldCount++;
             console.log(`  ✓ Set text field ${annotation.fieldName} = "${annotation.text}"`);
             continue; // Successfully handled as text field
@@ -1328,11 +1335,10 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       console.log(`Updated ${regularFieldCount} text fields and ${checkboxCount} checkboxes`);
 
       // CRITICAL: Update form field appearances so values are visible in the PDF
-      // Without this, field values are set in the data but not rendered visually
-      // Embed standard Helvetica font to ensure consistent rendering across all platforms
-      const helveticaFont = await pdfDoc.embedStandardFont(StandardFonts.Helvetica);
+      // Font was already embedded above and individual field appearances were updated
+      // This call ensures all fields have consistent black text rendering
       form.updateFieldAppearances(helveticaFont);
-      console.log('✓ Updated form field appearances with Helvetica font');
+      console.log('✓ Updated all form field appearances with Helvetica font and black color');
 
       // Flatten the form to convert interactive fields to static content
       // This MUST be done AFTER updateFieldAppearances() so the visual content is preserved
