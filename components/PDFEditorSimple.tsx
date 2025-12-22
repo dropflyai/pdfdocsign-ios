@@ -1334,23 +1334,11 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       form.updateFieldAppearances(helveticaFont);
       console.log('✓ Updated form field appearances with Helvetica font');
 
-      // Lock all form fields as read-only after appearance generation
-      // This must be done AFTER updateFieldAppearances() to ensure both visibility and locking work
-      let lockedFieldCount = 0;
-      for (const annotation of annotations) {
-        if (annotation.type === 'formfield' && annotation.fieldName && annotation.isFormField) {
-          try {
-            const field = form.getFieldMaybe(annotation.fieldName);
-            if (field) {
-              field.enableReadOnly();
-              lockedFieldCount++;
-            }
-          } catch (err) {
-            console.warn(`Could not lock field ${annotation.fieldName}:`, err);
-          }
-        }
-      }
-      console.log(`✓ Locked ${lockedFieldCount} form fields as read-only`);
+      // Flatten the form to convert interactive fields to static content
+      // This MUST be done AFTER updateFieldAppearances() so the visual content is preserved
+      // Flattening removes form fields entirely, preventing any editing in any PDF viewer
+      form.flatten();
+      console.log('✓ Flattened form - all fields converted to static content (not editable)');
 
       // Then, add other annotations (text, signatures, erasers, and editable text)
       let textAnnotationCount = 0;
