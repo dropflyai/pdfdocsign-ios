@@ -1316,6 +1316,19 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       // Then, update regular form field values
       let regularFieldCount = 0;
       let checkboxCount = 0;
+      let checkboxAnnotationCount = 0;
+
+      // First, log all checkbox annotations for diagnostics
+      console.log('=== CHECKBOX ANNOTATION DETECTION ===');
+      for (const annotation of annotations) {
+        if (annotation.type === 'formfield' && annotation.fieldType === 'checkbox') {
+          checkboxAnnotationCount++;
+          console.log(`Checkbox annotation found: fieldName="${annotation.fieldName}", isFormField=${annotation.isFormField}, isChecked=${annotation.isChecked}`);
+        }
+      }
+      console.log(`Total checkbox annotations found: ${checkboxAnnotationCount}`);
+      console.log('=====================================');
+
       for (const annotation of annotations) {
         if (annotation.type === 'formfield' && annotation.fieldName && annotation.isFormField && !annotation.groupId) {
           // Try checkbox first (most specific type)
@@ -1323,10 +1336,10 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
             const checkBox = form.getCheckBox(annotation.fieldName);
             if (annotation.isChecked) {
               checkBox.check();
-              console.log(`  ✓ Checked checkbox ${annotation.fieldName}`);
+              console.log(`  ✓ CHECKED checkbox ${annotation.fieldName}`);
             } else {
               checkBox.uncheck();
-              console.log(`  ✓ Unchecked checkbox ${annotation.fieldName}`);
+              console.log(`  ✓ UNCHECKED checkbox ${annotation.fieldName}`);
             }
             checkboxCount++;
             continue; // Successfully handled as checkbox
