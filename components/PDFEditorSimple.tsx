@@ -1386,23 +1386,41 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       // CRITICAL: Update form field appearances so values are visible in the PDF
       // Font was already embedded above and individual field appearances were updated
       // This call ensures all fields have consistent black text rendering
-      try {
+
+      // MOBILE-ONLY: Detect mobile Safari which has limitations with form operations
+      const isMobileSafari = typeof navigator !== 'undefined' &&
+        /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+        /WebKit/.test(navigator.userAgent) &&
+        !/CriOS|FxiOS|EdgiOS/.test(navigator.userAgent);
+
+      if (isMobileSafari) {
+        // Mobile Safari: Use defensive error handling due to Safari limitations
+        try {
+          form.updateFieldAppearances(helveticaFont);
+          console.log('✓ Updated all form field appearances with Helvetica font and black color');
+        } catch (appearanceError) {
+          console.warn('⚠️  Could not update form appearances (Safari limitation):', appearanceError);
+          // Continue - individual field appearances were already updated
+        }
+
+        // Flatten the form to convert interactive fields to static content
+        try {
+          form.flatten();
+          console.log('✓ Flattened form - all fields converted to static content (not editable)');
+        } catch (flattenError) {
+          console.warn('⚠️  Could not flatten form (Safari limitation):', flattenError);
+          // Continue without flattening - PDF will still have editable fields but values will be present
+        }
+      } else {
+        // Desktop: Standard code path (unchanged behavior)
         form.updateFieldAppearances(helveticaFont);
         console.log('✓ Updated all form field appearances with Helvetica font and black color');
-      } catch (appearanceError) {
-        console.warn('⚠️  Could not update form appearances (non-critical):', appearanceError);
-        // Continue - individual field appearances were already updated
-      }
 
-      // Flatten the form to convert interactive fields to static content
-      // This MUST be done AFTER updateFieldAppearances() so the visual content is preserved
-      // Flattening removes form fields entirely, preventing any editing in any PDF viewer
-      try {
+        // Flatten the form to convert interactive fields to static content
+        // This MUST be done AFTER updateFieldAppearances() so the visual content is preserved
+        // Flattening removes form fields entirely, preventing any editing in any PDF viewer
         form.flatten();
         console.log('✓ Flattened form - all fields converted to static content (not editable)');
-      } catch (flattenError) {
-        console.warn('⚠️  Could not flatten form (Safari limitation):', flattenError);
-        // Continue without flattening - PDF will still have editable fields but values will be present
       }
 
       // Then, add other annotations (text, signatures, erasers, and editable text)
