@@ -2117,18 +2117,18 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                           title="Delete text"
                           style={{
                             position: 'absolute',
-                            top: -22,
-                            right: 22,
-                            width: 18,
-                            height: 18,
+                            top: -40,
+                            right: 40,
+                            width: 36,
+                            height: 36,
                             backgroundColor: 'white',
                             color: '#000',
-                            border: '1px solid #999',
+                            border: '2px solid #999',
                             borderRadius: '50%',
-                            fontSize: '11px',
+                            fontSize: '18px',
                             fontWeight: 'bold',
                             cursor: 'pointer',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
                             zIndex: 10000,
                             pointerEvents: 'auto',
                             display: 'flex',
@@ -2150,8 +2150,13 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                         </button>
                         {/* Confirm button (matches signature style) */}
                         <button
+                          onTouchStart={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                          }}
                           onMouseDown={(e) => {
                             e.stopPropagation();
+                            e.preventDefault();
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -2161,18 +2166,18 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                           title="Confirm text"
                           style={{
                             position: 'absolute',
-                            top: -22,
+                            top: -40,
                             right: 2,
-                            width: 18,
-                            height: 18,
+                            width: 36,
+                            height: 36,
                             backgroundColor: 'white',
                             color: '#000',
-                            border: '1px solid #999',
+                            border: '2px solid #999',
                             borderRadius: '50%',
-                            fontSize: '11px',
+                            fontSize: '18px',
                             fontWeight: 'bold',
                             cursor: 'pointer',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
                             zIndex: 10000,
                             pointerEvents: 'auto',
                             display: 'flex',
@@ -2320,18 +2325,18 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                           title="Delete signature"
                           style={{
                             position: 'absolute',
-                            top: -22,
-                            right: 22,
-                            width: 18,
-                            height: 18,
+                            top: -40,
+                            right: 40,
+                            width: 36,
+                            height: 36,
                             backgroundColor: 'white',
                             color: '#000',
-                            border: '1px solid #999',
+                            border: '2px solid #999',
                             borderRadius: '50%',
-                            fontSize: '11px',
+                            fontSize: '18px',
                             fontWeight: 'bold',
                             cursor: 'pointer',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
                             zIndex: 10000,
                             pointerEvents: 'auto',
                             display: 'flex',
@@ -2352,8 +2357,13 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                           🗑️
                         </button>
                         <button
+                          onTouchStart={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                          }}
                           onMouseDown={(e) => {
                             e.stopPropagation();
+                            e.preventDefault();
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -2366,18 +2376,18 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                           title="Confirm signature"
                           style={{
                             position: 'absolute',
-                            top: -22,
+                            top: -40,
                             right: 2,
-                            width: 18,
-                            height: 18,
+                            width: 36,
+                            height: 36,
                             backgroundColor: 'white',
                             color: '#000',
-                            border: '1px solid #999',
+                            border: '2px solid #999',
                             borderRadius: '50%',
-                            fontSize: '11px',
+                            fontSize: '18px',
                             fontWeight: 'bold',
                             cursor: 'pointer',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
                             zIndex: 10000,
                             pointerEvents: 'auto',
                             display: 'flex',
