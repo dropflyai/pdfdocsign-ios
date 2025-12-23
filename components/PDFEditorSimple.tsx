@@ -1282,6 +1282,12 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       console.log('=== DOWNLOAD STARTED ===');
       console.log(`Total annotations: ${annotations.length}`);
 
+      // Detect iOS Safari once at the top for reuse throughout function
+      const isMobileSafari = typeof navigator !== 'undefined' &&
+        /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+        /WebKit/.test(navigator.userAgent) &&
+        !/CriOS|FxiOS|EdgiOS/.test(navigator.userAgent);
+
       const existingPdfBytes = await file.arrayBuffer();
       const pdfDoc = await PDFDocument.load(existingPdfBytes);
       const pages = pdfDoc.getPages();
@@ -1387,12 +1393,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       // Font was already embedded above and individual field appearances were updated
       // This call ensures all fields have consistent black text rendering
 
-      // MOBILE-ONLY: Detect mobile Safari which has limitations with form operations
-      const isMobileSafari = typeof navigator !== 'undefined' &&
-        /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-        /WebKit/.test(navigator.userAgent) &&
-        !/CriOS|FxiOS|EdgiOS/.test(navigator.userAgent);
-
+      // MOBILE-ONLY: Use defensive error handling for mobile Safari (variable defined at top of function)
       if (isMobileSafari) {
         // Mobile Safari: Use defensive error handling due to Safari limitations
         try {
@@ -1536,13 +1537,8 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
         filename = `${baseName}-edited.${extension}`;
       }
 
-      // MOBILE iOS: Use Web Share API which saves to Files app
+      // MOBILE iOS: Use Web Share API which saves to Files app (isMobileSafari defined at top)
       // Desktop: Use standard download link
-      const isMobileSafari = typeof navigator !== 'undefined' &&
-        /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-        /WebKit/.test(navigator.userAgent) &&
-        !/CriOS|FxiOS|EdgiOS/.test(navigator.userAgent);
-
       if (isMobileSafari && navigator.share) {
         // iOS: Use Share Sheet API to save to Files
         try {
