@@ -1524,23 +1524,63 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       const pdfBytes = await pdfDoc.save();
       console.log(`PDF saved: ${pdfBytes.length} bytes`);
       const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
 
-      // Use custom filename or generate default
+      // Generate filename
+      let filename: string;
       if (downloadFilename) {
-        link.download = downloadFilename;
+        filename = downloadFilename;
       } else {
         const nameParts = file.name.split('.');
         const extension = nameParts.pop();
         const baseName = nameParts.join('.');
-        link.download = `${baseName}-edited.${extension}`;
+        filename = `${baseName}-edited.${extension}`;
       }
 
-      link.click();
-      URL.revokeObjectURL(url);
-      setShowDownloadModal(false);
+      // MOBILE iOS: Use Web Share API which saves to Files app
+      // Desktop: Use standard download link
+      const isMobileSafari = typeof navigator !== 'undefined' &&
+        /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+        /WebKit/.test(navigator.userAgent) &&
+        !/CriOS|FxiOS|EdgiOS/.test(navigator.userAgent);
+
+      if (isMobileSafari && navigator.share) {
+        // iOS: Use Share Sheet API to save to Files
+        try {
+          const file = new File([blob], filename, { type: 'application/pdf' });
+          await navigator.share({
+            files: [file],
+            title: 'Download PDF',
+            text: 'Save your edited PDF to Files'
+          });
+          console.log('✓ PDF shared successfully via iOS Share Sheet');
+          setShowDownloadModal(false);
+        } catch (shareError: any) {
+          // User cancelled share or share failed
+          if (shareError.name === 'AbortError') {
+            console.log('User cancelled share');
+            setShowDownloadModal(false);
+          } else {
+            console.error('Share failed, falling back to standard download:', shareError);
+            // Fallback to standard download
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(url);
+            setShowDownloadModal(false);
+          }
+        }
+      } else {
+        // Desktop: Standard download link
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(url);
+        setShowDownloadModal(false);
+      }
     } catch (error) {
       console.error('Error generating PDF:', error);
       const errorMessage = error instanceof Error ? error.message : String(error);
