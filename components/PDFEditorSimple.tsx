@@ -1680,20 +1680,29 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
           {/* Render Annotations */}
           {annotations
             .filter(ann => ann.pageNumber === currentPage)
-            .map(ann => (
+            .map(ann => {
+              // Calculate positioning offset for expanded mobile touch targets
+              const isMobileCheckbox = typeof window !== 'undefined' && window.innerWidth < 768 && ann.fieldType === 'checkbox';
+              const minTouchSize = 44; // iOS minimum touch target
+              const actualWidth = ann.width * pageScale;
+              const actualHeight = ann.height * pageScale;
+              const offsetX = isMobileCheckbox && actualWidth < minTouchSize ? -(minTouchSize - actualWidth) / 2 : 0;
+              const offsetY = isMobileCheckbox && actualHeight < minTouchSize ? -(minTouchSize - actualHeight) / 2 : 0;
+
+              return (
               <div
                 key={ann.id}
                 style={{
                   position: 'absolute',
-                  left: ann.x * pageScale,
-                  top: ann.y * pageScale,
+                  left: ann.x * pageScale + offsetX,
+                  top: ann.y * pageScale + offsetY,
                   width: ann.width * pageScale,
                   height: ann.height * pageScale,
                   // Mobile-only: 44px touch targets for iOS accessibility
                   // BUT: only apply to checkboxes and non-grouped fields (not SSN/EIN digit boxes)
-                  ...(typeof window !== 'undefined' && window.innerWidth < 768 && ann.fieldType === 'checkbox' ? {
-                    minWidth: '44px',
-                    minHeight: '44px',
+                  ...(isMobileCheckbox ? {
+                    minWidth: `${minTouchSize}px`,
+                    minHeight: `${minTouchSize}px`,
                   } : {}),
                   padding: '0',
                   pointerEvents: 'auto',
@@ -2328,7 +2337,8 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                   </div>
                 )}
               </div>
-            ))}
+            );
+            })}
         </div>
 
         {/* Info Panel - Form Fields */}
