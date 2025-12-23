@@ -61,12 +61,11 @@ export default function PaywallModal() {
           </div>
 
           {/* CTA Buttons */}
-          <button
-            onClick={upgradeToPremium}
-            className="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl mb-3"
+          <div
+            className="w-full py-3.5 bg-gray-300 text-gray-500 font-semibold rounded-xl mb-3 text-center cursor-not-allowed"
           >
-            Start Free Trial
-          </button>
+            Coming Soon
+          </div>
           <button
             onClick={() => setShowPaywall(false)}
             className="w-full py-3 text-gray-600 font-medium hover:text-gray-900 transition-colors"

@@ -2099,12 +2099,18 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                       <>
                         {/* Delete button (matches signature style) */}
                         <button
+                          onTouchStart={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                          }}
                           onMouseDown={(e) => {
                             e.stopPropagation();
+                            e.preventDefault();
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
                             e.preventDefault();
+                            console.log('🗑️ Deleting text annotation');
                             setAnnotations(prev => prev.filter(a => a.id !== ann.id));
                             setSelectedAnnotation(null);
                           }}
@@ -2295,8 +2301,13 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                     {selectedSignatureId === ann.id && !confirmedSignatureIds.has(ann.id) && !draggingId && !resizingId && (
                       <>
                         <button
+                          onTouchStart={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                          }}
                           onMouseDown={(e) => {
                             e.stopPropagation();
+                            e.preventDefault();
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
