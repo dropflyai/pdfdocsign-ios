@@ -1645,10 +1645,10 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                 key={ann.id}
                 style={{
                   position: 'absolute',
-                  left: ann.fieldType === 'checkbox' ? (ann.x * pageScale) - 6 : ann.x * pageScale,
-                  top: ann.fieldType === 'checkbox' ? (ann.y * pageScale) - 6 : ann.y * pageScale,
-                  width: ann.fieldType === 'checkbox' ? Math.max(ann.width * pageScale, 24) : ann.width * pageScale,
-                  height: ann.fieldType === 'checkbox' ? Math.max(ann.height * pageScale, 24) : ann.height * pageScale,
+                  left: ann.x * pageScale,
+                  top: ann.y * pageScale,
+                  width: ann.width * pageScale,
+                  height: ann.height * pageScale,
                   // Mobile-only: 44px touch targets for iOS accessibility
                   // BUT: only apply to checkboxes and non-grouped fields (not SSN/EIN digit boxes)
                   ...(typeof window !== 'undefined' && window.innerWidth < 768 && ann.fieldType === 'checkbox' ? {
