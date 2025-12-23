@@ -486,7 +486,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
         return [];
       }
 
-      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
       console.log('✅ PDFDocument loaded successfully');
 
       const form = pdfDoc.getForm();
@@ -777,7 +777,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
     try {
       // We need the page dimensions to convert coordinates
       const arrayBuffer = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
       const pages = pdfDoc.getPages();
       console.log('Total pages:', pages.length);
 
@@ -1289,7 +1289,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
         !/CriOS|FxiOS|EdgiOS/.test(navigator.userAgent);
 
       const existingPdfBytes = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(existingPdfBytes);
+      const pdfDoc = await PDFDocument.load(existingPdfBytes, { ignoreEncryption: true });
       const pages = pdfDoc.getPages();
       const form = pdfDoc.getForm();
 
