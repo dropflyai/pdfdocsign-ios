@@ -796,9 +796,11 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
 
         console.log(`Converting field "${field.name}":`, {
           type: field.type,
+          value: field.value,
           rect: field.rect,
           pageNumber: field.pageNumber,
-          pageIndex
+          pageIndex,
+          isCheckbox: field.type === 'checkbox'
         });
 
         // Check if page exists
@@ -963,7 +965,18 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
               textColor: '#000000',
             };
 
-            console.log('  Created annotation:', annotation);
+            if (field.type === 'checkbox') {
+              console.log('  ✅ Created CHECKBOX annotation:', {
+                id: annotation.id,
+                fieldName: annotation.fieldName,
+                position: `(${x}, ${canvasY})`,
+                size: `${width}x${height}`,
+                isChecked: annotation.isChecked,
+                pageNumber: annotation.pageNumber
+              });
+            } else {
+              console.log('  Created annotation:', annotation);
+            }
             newAnnotations.push(annotation);
           }
         } else {
@@ -1624,10 +1637,13 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
           }}
           style={{
             cursor: selectedTool === 'signature' || selectedTool === 'text' ? 'crosshair' : 'default',
-            transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoom})`,
+            transform: `translate3d(${panOffset.x}px, ${panOffset.y}px, 0) scale(${zoom})`,
             transformOrigin: 'center center',
-            transition: isPinching ? 'none' : 'transform 0.2s ease-out',
-            touchAction: 'auto'  // iOS: Allow touch on form inputs
+            transition: 'none',  // Remove transition for smoother scrolling
+            touchAction: 'auto',  // iOS: Allow touch on form inputs
+            willChange: 'transform',  // GPU acceleration
+            backfaceVisibility: 'hidden',  // Performance optimization
+            WebkitBackfaceVisibility: 'hidden'
           }}
         >
           <Document
