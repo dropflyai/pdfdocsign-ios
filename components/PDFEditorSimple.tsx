@@ -2097,7 +2097,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                     {/* Action icons - delete and accept (matching signature style) */}
                     {selectedAnnotation === ann.id && !draggingId && !resizingId && (
                       <>
-                        {/* Delete button (matches signature style) */}
+                        {/* Delete button (matches signature style) - Mobile optimized */}
                         <button
                           onTouchStart={(e) => {
                             e.stopPropagation();
@@ -2117,10 +2117,12 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                           title="Delete text"
                           style={{
                             position: 'absolute',
-                            top: -40,
-                            right: 40,
-                            width: 36,
-                            height: 36,
+                            // Mobile: Position inside the box at top-right if not enough space above
+                            top: typeof window !== 'undefined' && window.innerWidth < 768 && (ann.y * pageScale) < 50 ? 4 : -44,
+                            right: typeof window !== 'undefined' && window.innerWidth < 768 ? 4 : 40,
+                            // Mobile: Larger touch target (44px minimum iOS standard)
+                            width: typeof window !== 'undefined' && window.innerWidth < 768 ? 44 : 36,
+                            height: typeof window !== 'undefined' && window.innerWidth < 768 ? 44 : 36,
                             backgroundColor: 'white',
                             color: '#000',
                             border: '2px solid #999',
@@ -2166,10 +2168,12 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                           title="Confirm text"
                           style={{
                             position: 'absolute',
-                            top: -40,
-                            right: 2,
-                            width: 36,
-                            height: 36,
+                            // Mobile: Position inside the box at top-left if not enough space above
+                            top: typeof window !== 'undefined' && window.innerWidth < 768 && (ann.y * pageScale) < 50 ? 4 : -44,
+                            right: typeof window !== 'undefined' && window.innerWidth < 768 ? 52 : 2,
+                            // Mobile: Larger touch target (44px minimum iOS standard)
+                            width: typeof window !== 'undefined' && window.innerWidth < 768 ? 44 : 36,
+                            height: typeof window !== 'undefined' && window.innerWidth < 768 ? 44 : 36,
                             backgroundColor: 'white',
                             color: '#000',
                             border: '2px solid #999',
@@ -2325,10 +2329,12 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                           title="Delete signature"
                           style={{
                             position: 'absolute',
-                            top: -40,
-                            right: 40,
-                            width: 36,
-                            height: 36,
+                            // Mobile: Position inside the box at top-right if not enough space above
+                            top: typeof window !== 'undefined' && window.innerWidth < 768 && (ann.y * pageScale) < 50 ? 4 : -44,
+                            right: typeof window !== 'undefined' && window.innerWidth < 768 ? 4 : 40,
+                            // Mobile: Larger touch target (44px minimum iOS standard)
+                            width: typeof window !== 'undefined' && window.innerWidth < 768 ? 44 : 36,
+                            height: typeof window !== 'undefined' && window.innerWidth < 768 ? 44 : 36,
                             backgroundColor: 'white',
                             color: '#000',
                             border: '2px solid #999',
@@ -2376,10 +2382,12 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                           title="Confirm signature"
                           style={{
                             position: 'absolute',
-                            top: -40,
-                            right: 2,
-                            width: 36,
-                            height: 36,
+                            // Mobile: Position inside the box at top-left if not enough space above
+                            top: typeof window !== 'undefined' && window.innerWidth < 768 && (ann.y * pageScale) < 50 ? 4 : -44,
+                            right: typeof window !== 'undefined' && window.innerWidth < 768 ? 52 : 2,
+                            // Mobile: Larger touch target (44px minimum iOS standard)
+                            width: typeof window !== 'undefined' && window.innerWidth < 768 ? 44 : 36,
+                            height: typeof window !== 'undefined' && window.innerWidth < 768 ? 44 : 36,
                             backgroundColor: 'white',
                             color: '#000',
                             border: '2px solid #999',

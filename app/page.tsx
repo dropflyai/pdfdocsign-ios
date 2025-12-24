@@ -74,9 +74,9 @@ export default function Home() {
   };
 
   return (
-    <main className="mobile-viewport flex flex-col bg-gradient-to-br from-indigo-50/30 via-white to-purple-50/30">
+    <main className="mobile-viewport min-h-screen flex flex-col bg-gradient-to-br from-indigo-50/30 via-white to-purple-50/30">
       {!pdfFile ? (
-        <div className="flex flex-col h-full w-full">
+        <div className="flex flex-col min-h-screen w-full">
           {/* Minimal Header with Safe Area */}
           <header className="safe-area-top border-b border-slate-100/50 bg-white/70 backdrop-blur-md sticky top-0 z-50">
             <div className="max-w-4xl mx-auto px-4 sm:px-8 py-3 sm:py-4 flex items-center justify-between">
