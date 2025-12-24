@@ -76,7 +76,7 @@ export default function Home() {
   return (
     <main className="mobile-viewport min-h-screen flex flex-col bg-gradient-to-br from-indigo-50/30 via-white to-purple-50/30">
       {!pdfFile ? (
-        <div className="flex flex-col min-h-screen w-full">
+        <div className="flex flex-col h-full w-full">
           {/* Minimal Header with Safe Area */}
           <header className="safe-area-top border-b border-slate-100/50 bg-white/70 backdrop-blur-md sticky top-0 z-50">
             <div className="max-w-4xl mx-auto px-4 sm:px-8 py-3 sm:py-4 flex items-center justify-between">
@@ -92,7 +92,7 @@ export default function Home() {
           </header>
 
           {/* Centered Content */}
-          <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-16 safe-area-bottom">
+          <div className="flex-1 flex items-start sm:items-center justify-center px-4 sm:px-6 py-8 sm:py-16 safe-area-bottom">
             <div className="w-full max-w-2xl">
 
               {/* Hero Section */}

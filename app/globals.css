@@ -54,8 +54,8 @@ body {
   padding-right: max(env(safe-area-inset-right), 0px);
 }
 
-/* Mobile viewport fix */
+/* Mobile viewport fix - allows scrolling when content exceeds viewport */
 .mobile-viewport {
-  height: 100vh;
-  height: -webkit-fill-available;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
 }
